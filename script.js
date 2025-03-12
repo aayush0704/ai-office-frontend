@@ -1,9 +1,11 @@
 const BACKEND_URL = "https://ai-office-backend.onrender.com";
 
 async function sendMessage() {
-    let userMessage = document.getElementById("user-input").value;
-    document.getElementById("chat-box").innerHTML += `<p><b>You:</b> ${userMessage}</p>`;
-    
+    let userMessage = document.getElementById("user-input").value.trim();
+    if (!userMessage) return;
+
+    appendMessage("You", userMessage, "user");
+
     const response = await fetch(`${BACKEND_URL}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -11,5 +13,15 @@ async function sendMessage() {
     });
 
     const data = await response.json();
-    document.getElementById("chat-box").innerHTML += `<p><b>Bot:</b> ${data.reply}</p>`;
+    appendMessage("Bot", data.reply, "bot");
+    document.getElementById("user-input").value = "";
+}
+
+function appendMessage(sender, message, type) {
+    let chatBox = document.getElementById("chat-box");
+    let messageElement = document.createElement("div");
+    messageElement.classList.add("message", type);
+    messageElement.innerHTML = `<b>${sender}:</b> ${message}`;
+    chatBox.appendChild(messageElement);
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
